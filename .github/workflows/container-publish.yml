@@ -35,24 +35,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }} 
 
-      - name: Build and push Docker image (arm64)
-        id: container-build-and-push-arm64
+      - name: Build and push Docker image
+        id: container-build-and-push
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile.arm64
           push: true
-          platforms: linux/arm64/v8
+          platforms: linux/amd64,linux/arm64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.ref_name }}, ${{ env.REGISTRY }}/${{ github.repository }}:latest, ${{ github.repository }}:${{ github.ref_name }}, ${{ github.repository }}:latest
-        
-      
-      - name: Build and push Docker image (x64)
-        id: container-build-and-push-x64
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Dockerfile.x64
-          push: true
-          platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.ref_name }}, ${{ env.REGISTRY }}/${{ github.repository }}:latest, ${{ github.repository }}:${{ github.ref_name }}, ${{ github.repository }}:latest
-        

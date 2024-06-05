@@ -1,8 +1,12 @@
 FROM debian:12.5
 
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
+
 ENV RUNNER_VERSION=2.317.0
 ENV DEBIAN_FRONTEND=noninteractive
-ENV ARCH=x64
 ENV DEFAULT_USER=github
 
 LABEL BaseImage="debian:12.5"
@@ -17,8 +21,8 @@ RUN apt-get install -y --no-install-recommends \
 
 # GitHub Actions Runner
 RUN cd /home/${DEFAULT_USER} && mkdir actions-runner && cd actions-runner \
-    && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz \
-    && tar xzf actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz && rm actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz
+    && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${TARGETARCH}-${RUNNER_VERSION}.tar.gz \
+    && tar xzf actions-runner-linux-${TARGETARCH}-${RUNNER_VERSION}.tar.gz && rm actions-runner-linux-${TARGETARCH}-${RUNNER_VERSION}.tar.gz
 
 # GitHub Actions Runner additional dependencies
 RUN chown -R ${DEFAULT_USER} /home/${DEFAULT_USER} && /home/${DEFAULT_USER}/actions-runner/bin/installdependencies.sh
