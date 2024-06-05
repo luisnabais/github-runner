@@ -1,4 +1,4 @@
-FROM debian:12.5
+FROM debian:12.5 AS base
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -19,12 +19,25 @@ RUN apt-get update -y && apt-get upgrade -y && useradd -m ${DEFAULT_USER}
 RUN apt-get install -y --no-install-recommends \
     curl nodejs wget unzip vim git jq build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip
 
+
 # GitHub Actions Runner
+FROM base AS image-amd64
+RUN echo "Adding GitHub Actions Runner for x64"
+ENV ARCH=x64
 RUN cd /home/${DEFAULT_USER} && mkdir actions-runner && cd actions-runner \
-    && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${TARGETARCH}-${RUNNER_VERSION}.tar.gz \
-    && tar xzf actions-runner-linux-${TARGETARCH}-${RUNNER_VERSION}.tar.gz && rm actions-runner-linux-${TARGETARCH}-${RUNNER_VERSION}.tar.gz
+    && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz \
+    && tar xzf actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz && rm actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz
+
+FROM base AS image-arm64
+RUN echo "Adding GitHub Actions Runner for arm64"
+ENV ARCH=arm64
+RUN cd /home/${DEFAULT_USER} && mkdir actions-runner && cd actions-runner \
+    && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz \
+    && tar xzf actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz && rm actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz
+
 
 # GitHub Actions Runner additional dependencies
+FROM image-${TARGETARCH} AS final
 RUN chown -R ${DEFAULT_USER} /home/${DEFAULT_USER} && /home/${DEFAULT_USER}/actions-runner/bin/installdependencies.sh
 
 # Start script
