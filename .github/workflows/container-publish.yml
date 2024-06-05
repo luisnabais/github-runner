@@ -36,7 +36,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }} 
 
       - name: Build and push Docker image (arm64)
-        id: container-build-and-push
+        id: container-build-and-push-arm64
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -47,7 +47,7 @@ jobs:
         
       
       - name: Build and push Docker image (x64)
-        id: container-build-and-push
+        id: container-build-and-push-x64
         uses: docker/build-push-action@v5
         with:
           context: .
