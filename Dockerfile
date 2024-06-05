@@ -21,7 +21,7 @@ RUN cd /home/${DEFAULT_USER} && mkdir actions-runner && cd actions-runner \
     && tar xzf ./actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz
 
 # GitHub Actions Runner additional dependencies
-RUN chown -R ${DEFAULT_USER}:${DEFAULT_USER} ~${DEFAULT_USER} && /home/${DEFAULT_USER}/actions-runner/bin/installdependencies.sh
+RUN chown -R ${DEFAULT_USER} /home/${DEFAULT_USER} && /home/${DEFAULT_USER}/actions-runner/bin/installdependencies.sh
 
 # Start script
 ADD files/start.sh start.sh
