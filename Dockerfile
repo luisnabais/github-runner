@@ -1,4 +1,4 @@
-FROM debian:12.5 AS base
+FROM debian:12.5
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -22,17 +22,13 @@ RUN apt-get install -y --no-install-recommends \
 
 # GitHub Actions Runner
 ENV ARCH=x64
-RUN if [[ "${TARGETARCH}" == "amd64" ]] ; then \
+RUN if [ "${TARGETARCH}"=="amd64" ] ; then \
       ARCH="x64"; \
-    elif [[ "${TARGETARCH}" == "arm64" ]] ; then \
-      ARCH="arm64"; \
     else \
-      echo "Unsupported architecture."; \
-      exit 1; \
-    fi
-
-RUN echo "Adding GitHub Actions Runner for x64"
-RUN cd /home/${DEFAULT_USER} && mkdir actions-runner && cd actions-runner \
+      ARCH="${TARGETARCH}"; \
+    fi \
+    && echo "Adding GitHub Actions Runner for x64" \
+    && cd /home/${DEFAULT_USER} && mkdir actions-runner && cd actions-runner \
     && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz \
     && tar xzf actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz && rm actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz \
     && ls -lha
