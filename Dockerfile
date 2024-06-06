@@ -21,7 +21,7 @@ RUN apt-get install -y --no-install-recommends \
 
 
 # GitHub Actions Runner
-RUN [[ "${TARGETARCH}" = "amd64" ]] && ARCH="x64" || ARCH="$TARGETARCH"; \
+RUN if [ "${TARGETARCH}" = "amd64" ]; then ARCH="x64" else ARCH="$TARGETARCH" fi; \
     echo "Adding GitHub Actions Runner for ${ARCH}" \
     && cd /home/${DEFAULT_USER} && mkdir actions-runner && cd actions-runner \
     && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz \
@@ -32,8 +32,9 @@ RUN [[ "${TARGETARCH}" = "amd64" ]] && ARCH="x64" || ARCH="$TARGETARCH"; \
 RUN chown -R ${DEFAULT_USER} /home/${DEFAULT_USER} && /home/${DEFAULT_USER}/actions-runner/bin/installdependencies.sh
 
 # Start script
-ADD files/start.sh start.sh
-RUN chmod +x start.sh
+ADD files/start.sh /home/${DEFAULT_USER}/actions-runner/start.sh
+RUN chmod +x /home/${DEFAULT_USER}/actions-runner/start.sh
 
 USER ${DEFAULT_USER}
-ENTRYPOINT ["./start.sh"]
+WORKDIR /home/${DEFAULT_USER}/actions-runner
+ENTRYPOINT ["/home/${DEFAULT_USER}/actions-runner/start.sh"]
