@@ -26,7 +26,7 @@ RUN if [[ "${TARGETARCH}" == "amd64" ]] ; then \
       ARCH="x64"; \
     elif [[ "${TARGETARCH}" == "arm64" ]] ; then \
       ARCH="arm64"; \
-    else
+    else \
       echo "Unsupported architecture."; \
       exit 1; \
     fi
