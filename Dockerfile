@@ -21,7 +21,7 @@ RUN apt-get install -y --no-install-recommends \
 
 
 # GitHub Actions Runner
-RUN if [ "${TARGETARCH}" = "amd64" ]; then ARCH="x64" else ARCH="$TARGETARCH" fi; \
+RUN if [ "${TARGETARCH}" = "amd64" ]; then ARCH="x64"; else ARCH="$TARGETARCH"; fi; \
     echo "Adding GitHub Actions Runner for ${ARCH}" \
     && cd /home/${DEFAULT_USER} && mkdir actions-runner && cd actions-runner \
     && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz \
