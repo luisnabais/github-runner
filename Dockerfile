@@ -12,9 +12,6 @@ ENV DEFAULT_USER=github
 LABEL BaseImage="debian:12.5"
 LABEL RunnerVersion=${RUNNER_VERSION}
 
-# Debug
-RUN echo "BUILDPLATFORM: $BUILDPLATFORM; TARGETPLATFORM: $TARGETPLATFORM; TARGETOS: $TARGETOS; TARGETARCH: $TARGETARCH"
-
 # Update base packages & add a non root/sudo user
 RUN apt-get update -y && apt-get upgrade -y && useradd -m ${DEFAULT_USER}
 
@@ -24,23 +21,23 @@ RUN apt-get install -y --no-install-recommends \
 
 
 # GitHub Actions Runner
-FROM base AS image-amd64
-RUN echo "Adding GitHub Actions Runner for x64"
 ENV ARCH=x64
+RUN if [[ "${TARGETARCH}" == "amd64" ]] ; then \
+      ARCH="x64"; \
+    elif [[ "${TARGETARCH}" == "arm64" ]] ; then \
+      ARCH="arm64"; \
+    else
+      echo "Unsupported architecture."; \
+      exit 1; \
+    fi
+
+RUN echo "Adding GitHub Actions Runner for x64"
 RUN cd /home/${DEFAULT_USER} && mkdir actions-runner && cd actions-runner \
     && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz \
-    && tar xzf actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz && rm actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz
-
-FROM base AS image-arm64
-RUN echo "Adding GitHub Actions Runner for arm64"
-ENV ARCH=arm64
-RUN cd /home/${DEFAULT_USER} && mkdir actions-runner && cd actions-runner \
-    && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz \
-    && tar xzf actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz && rm actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz
-
+    && tar xzf actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz && rm actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz \
+    && ls -lha
 
 # GitHub Actions Runner additional dependencies
-FROM image-${TARGETARCH} AS final
 RUN chown -R ${DEFAULT_USER} /home/${DEFAULT_USER} && /home/${DEFAULT_USER}/actions-runner/bin/installdependencies.sh
 
 # Start script
