@@ -12,6 +12,9 @@ ENV DEFAULT_USER=github
 LABEL BaseImage="debian:12.5"
 LABEL RunnerVersion=${RUNNER_VERSION}
 
+# Debug
+RUN echo "BUILDPLATFORM: $BUILDPLATFORM; TARGETPLATFORM: $TARGETPLATFORM; TARGETOS: $TARGETOS; TARGETARCH: $TARGETARCH"
+
 # Update base packages & add a non root/sudo user
 RUN apt-get update -y && apt-get upgrade -y && useradd -m ${DEFAULT_USER}
 
